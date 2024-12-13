@@ -1,0 +1,63 @@
+#import joblib
+import pandas as pd
+
+# Load the model from the dataset path
+#model_1 = joblib.load('/kaggle/input/your-dataset-name/model_1.pkl')
+
+# Load predictions
+predictions_model_1 = pd.read_csv('/kaggle/input/y-pred/y_pred.csv')
+
+
+
+# Load the predictions from the first model
+y_pred_model_1 = pd.read_csv('/kaggle/input/y-pred/y_pred.csv')['Predicted_Labels'].values
+
+# Ensure y_pred_model_1 and test_predictions have the same length
+y_pred_model_1 = y_pred_model_1[:len(test_predictions)]
+
+assert len(y_pred_model_1) == len(test_predictions), "Mismatch in the length of predictions!"
+# Predict on the test set for the second model (already provided in your code)
+test_predictions = model.predict_generator(test, len(test))
+test_predictions = test_predictions.argmax(axis=-1)
+
+
+import pandas as pd
+
+# Convert y_pred to a DataFrame
+y_pred_df = pd.DataFrame(test_predictions, columns=['Predicted_Labels'])
+
+# Save the DataFrame to a CSV file
+y_pred_df.to_csv('/kaggle/working/y_pred_cap.csv', index=False)
+
+
+import numpy as np
+import pandas as pd
+
+# Define weights for the models
+weight_model_1 = 0.8  # Weight for Model 1
+weight_model_2 = 0.8 # Weight for Model 2
+
+# Ensure both predictions are binary (0 or 1)
+assert np.all(np.isin(y_pred_model_1, [0, 1])), "Model 1 predictions must be binary!"
+assert np.all(np.isin(test_predictions, [0, 1])), "Model 2 predictions must be binary!"
+
+# Combine the predictions using weighted sum
+# Since we have binary labels, the weighted sum will range from 0 to 1
+ensemble_predictions = (weight_model_1 * y_pred_model_1) + (weight_model_2 * test_predictions)
+
+# Convert the weighted sum to binary predictions
+# If the weighted sum is >= 0.5, predict 1; otherwise, predict 0
+final_predictions = (ensemble_predictions >= 0.5).astype(int)
+
+# Optionally, return or print the final predictions
+print(final_predictions)
+len(final_predictions)
+
+
+from sklearn.metrics import accuracy_score, precision_score
+
+accuracy = accuracy_score(test_predictions, final_predictions)
+print(f"Accuracy: {accuracy:.4f}")
+
+precision = precision_score(test_predictions, final_predictions)
+print(f"Precision: {precision:.4f}")
